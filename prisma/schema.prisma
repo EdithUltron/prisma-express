@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model login_facultylogin {
+  id                     Int                    @id @default(autoincrement())
+  email                  String                 @unique(map: "sqlite_autoindex_login_facultylogin_1")
+  password               String
+  register_id            Int
+  signup_facultyregister signup_facultyregister @relation(fields: [register_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([register_id], map: "login_facultylogin_register_id_8ae70b52")
+}
+
+model login_login {
+  id              Int             @id @default(autoincrement())
+  email           String          @unique(map: "sqlite_autoindex_login_login_1")
+  password        String
+  register_id     Int
+  signup_register signup_register @relation(fields: [register_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([register_id], map: "login_login_register_id_866222c6")
+}
+
+model signup_adminregister {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique(map: "sqlite_autoindex_signup_adminregister_1")
+  password   String
+  phone      String?
+  createdAt  DateTime
+  department String
+}
+
+model signup_facultyregister {
+  id                    Int                     @id @default(autoincrement())
+  fullname              String?
+  email                 String                  @unique(map: "sqlite_autoindex_signup_facultyregister_1")
+  password              String
+  phone                 String?
+  department            String
+  aboutme               String?
+  profile_pic           String
+  createdAt             DateTime
+  login_facultylogin    login_facultylogin[]
+}
+
+model signup_register {
+  id                Int                 @id @default(autoincrement())
+  roll              String?
+  email             String              @unique(map: "sqlite_autoindex_signup_register_1")
+  password          String
+  phone             String?
+  department        String
+  createdAt         DateTime
+  fullname          String?
+  profile_pic       String
+  aboutme           String?
+  year              String
+  login_login       login_login[]
+}
