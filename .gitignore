@@ -27,4 +27,4 @@ coverage
 
 .history/
 
-.env
+env
