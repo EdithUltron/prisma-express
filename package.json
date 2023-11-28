@@ -1,16 +1,17 @@
 {
   "name": "prisma-express",
   "version": "1.0.0",
-  "description": "for scs",
-  "main": "index.js",
+  "description": "SCS",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --experimental-specifier-resolution=node ./src/server.ts",
-    "build": "npm install && npx prisma migrate deploy && npx prisma generate && npx prisma db seed && tsc",
-    "start": "node ./dist/server.js",
-    "vercel-build": "npm run build",
-    "seed": "ts-node prisma/seed.ts"
+    "build": "tsc --build",
+    "start": "node src/server.js",
+    "vercel-build": "npm install && npx prisma migrate deploy && npx prisma generate && npx prisma db seed && tsc --build",
+    "seed": "ts-node prisma/seed.ts",
+    "postbuild": "mv node_modules ./dist"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
