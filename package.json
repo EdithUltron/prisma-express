@@ -9,7 +9,7 @@
     "dev": "nodemon --experimental-specifier-resolution=node ./src/server.ts",
     "build": "npx prisma migrate deploy && npx prisma generate && tsc",
     "start": "node ./dist/server.js",
-    "vercel-build": "npm run build && npm run start",
+    "vercel-build": "npm run build",
     "postinstall": "prisma generate",
     "seed": "ts-node prisma/seed.ts"
   },
