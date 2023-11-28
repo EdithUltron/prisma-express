@@ -7,59 +7,350 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model login_facultylogin {
-  id                     Int                    @id @default(autoincrement())
-  email                  String                 @unique(map: "sqlite_autoindex_login_facultylogin_1")
-  password               String
-  register_id            Int
-  signup_facultyregister signup_facultyregister @relation(fields: [register_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model studentRegister {
+  id           String @id @default(uuid())
+  studentEmail String @unique
+  studentPhone String @unique
 
-  @@index([register_id], map: "login_facultylogin_register_id_8ae70b52")
+  dob                   DateTime?   @db.Date
+  firstName             String?
+  lastName              String?
+  branchId              String?
+  reservationCategoryId String?
+  bloodGroup            bloodGroup?
+  gender                Gender?
+  communityId           String?
+  annualIncome          String?
+  address               String?
+  religion              Religion?
+  nationalityId         String?
+  fatherName            String?
+  fatherOccupation      String?
+  fatherPhone           String?
+  isRegistered          Boolean?    @default(false)
+
+  admissionExamsId String?
+  rank             String?
+  programId        String?
+  permanentAddress String?
+  studentAadhaar   String? @unique
+  yearOfAdmission  String?
+
+  motherAadhaar String?
+  fatherAadhaar String?
+  createdOn     DateTime @default(now())
+  updatedOn     DateTime @updatedAt
+
+  branch        Branch?         @relation(fields: [branchId], references: [id])
+  Category      Category?       @relation(fields: [reservationCategoryId], references: [id])
+  community     Community?      @relation(fields: [communityId], references: [id])
+  nationality   Nationality?    @relation(fields: [nationalityId], references: [id])
+  admittedUnder admissionExams? @relation(fields: [admissionExamsId], references: [id])
+  joinedProgram Program?        @relation(fields: [programId], references: [id])
+  Student       Student?
+
+  @@unique([studentEmail, studentPhone])
+  @@index([studentEmail])
+  @@index([studentPhone])
 }
 
-model login_login {
-  id              Int             @id @default(autoincrement())
-  email           String          @unique(map: "sqlite_autoindex_login_login_1")
-  password        String
-  register_id     Int
-  signup_register signup_register @relation(fields: [register_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Student {
+  id                  String                @id @default(uuid())
+  studentRegisterId   String                @unique
+  password            String
+  rollNumber          String?               @default("not-assigned")
+  about               String?
+  role                Role                  @default(STUDENT)
+  pid                 Projects[]
+  education           Education[]
+  experience          Experience[]
+  volunteering        Volunteering[]
+  socialIdentifiers   socialIdentifiers[]
+  studentCertificates studentCertificates[]
+  studentPublications studentPublications[]
+  studentPatents      studentPatents[]
+  participationExams  participationExams[]
+  achievements        Achievements[]
+  coCurricular        coCurricular[]
+  extraCurricular     extraCurricular[]
+  skills              Skills[]
 
-  @@index([register_id], map: "login_login_register_id_866222c6")
+  createdOn DateTime        @default(now())
+  updatedOn DateTime        @updatedAt
+  sid       studentRegister @relation(fields: [studentRegisterId], references: [id], onDelete: Cascade)
+
+  @@unique([rollNumber, studentRegisterId])
+  @@index([studentRegisterId])
 }
 
-model signup_adminregister {
-  id         Int      @id @default(autoincrement())
-  email      String   @unique(map: "sqlite_autoindex_signup_adminregister_1")
-  password   String
-  phone      String?
-  createdAt  DateTime
-  department String
+enum bloodGroup {
+  O_POS
+  O_NEG
+  A_POS
+  A_NEG
+  B_POS
+  B_NEG
+  AB_POS
+  AB_NEG
+  OTHER
 }
 
-model signup_facultyregister {
-  id                    Int                     @id @default(autoincrement())
-  fullname              String?
-  email                 String                  @unique(map: "sqlite_autoindex_signup_facultyregister_1")
-  password              String
-  phone                 String?
-  department            String
-  aboutme               String?
-  profile_pic           String
-  createdAt             DateTime
-  login_facultylogin    login_facultylogin[]
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
 }
 
-model signup_register {
-  id                Int                 @id @default(autoincrement())
-  roll              String?
-  email             String              @unique(map: "sqlite_autoindex_signup_register_1")
-  password          String
-  phone             String?
-  department        String
-  createdAt         DateTime
-  fullname          String?
-  profile_pic       String
-  aboutme           String?
-  year              String
-  login_login       login_login[]
+enum Religion {
+  HINDUISM
+  ISLAM
+  CRISTIANITY
+  SIKHISM
+  BUDDHISM
+  JAINISM
+  OTHER
 }
+
+model Branch {
+  id               String            @id @default(uuid())
+  name             String            @unique
+  imageUrl         String?
+  slugLine         String?
+  Student_Register studentRegister[]
+}
+
+model Category {
+  id               String            @id @default(uuid())
+  category_name    String            @unique
+  Student_Register studentRegister[]
+}
+
+model Community {
+  id              String            @id @default(uuid())
+  communityName   String            @unique
+  studentRegister studentRegister[]
+}
+
+model Nationality {
+  id              String            @id @default(uuid())
+  nationality     String            @unique
+  studentRegister studentRegister[]
+}
+
+model admissionExams {
+  id              String            @id @default(uuid())
+  examName        String            @unique
+  studentRegister studentRegister[]
+}
+
+// btech,mtech...
+model Program {
+  id              String            @id @default(uuid())
+  programName     String            @unique
+  studentRegister studentRegister[]
+}
+
+model Projects {
+  id          String   @id @default(uuid())
+  projectName String
+  duration    String
+  description String
+  url         String?
+  studentId   String
+  skills      Skills[]
+  sid         Student  @relation(fields: [studentId], references: [id])
+}
+
+model Experience {
+  id          String         @id @default(uuid())
+  et          experienceType
+  mode        experienceMode
+  description String
+  company     String
+  role        String
+  startDate   DateTime       @db.Date
+  endDate     DateTime?      @db.Date
+  studentId   String
+  sid         Student        @relation(fields: [studentId], references: [id])
+}
+
+enum experienceType {
+  JOB
+  INTERNSHIP
+  APPRENTICESHIP
+  OTHER
+}
+
+model Skills {
+  id        String     @id @default(uuid())
+  skillName String     @unique
+  icon      String?
+  projects  Projects[]
+  student   Student[]
+}
+
+enum experienceMode {
+  ONSITE
+  REMOTE
+  HYBRID
+}
+
+model Volunteering {
+  id               String    @id @default(uuid())
+  organizationName String
+  description      String
+  role             String
+  startDate        DateTime  @db.Date
+  endDate          DateTime? @db.Date
+  Student          Student?  @relation(fields: [studentId], references: [id])
+  studentId        String?
+}
+
+model socialIdentifiers {
+  id        String  @id @default(uuid())
+  name      Socials
+  url       String
+  studentId String
+  Student   Student @relation(fields: [studentId], references: [id])
+}
+
+enum Socials {
+  PERSONAL_WEBSITE
+  LINKEDIN
+  YOUTUBE
+  TWITTER
+  DISCORD
+  FACEBOOK
+  INSTAGRAM
+  BLOG
+}
+
+model studentCertificates {
+  id                 String    @id @default(uuid())
+  certificateName    String
+  issuedOrganization String
+  issuedDate         DateTime  @db.Date
+  validDate          DateTime? @db.Date
+  certificateUrl     String
+  studentId          String?
+  Student            Student?  @relation(fields: [studentId], references: [id])
+}
+
+model Education {
+  id            String    @id @default(uuid())
+  instituteName String
+  place         String?
+  startDate     DateTime  @db.Date
+  endDate       DateTime? @db.Date
+  grades        String
+  description   String?
+  program       String
+  board         String? // for 10th
+  fieldOfStudy  String // branch, mpc, 10th - state
+  studentId     String?
+  Student       Student?  @relation(fields: [studentId], references: [id])
+}
+
+model studentPublications {
+  id               String   @id @default(uuid())
+  publicationTitle String
+  publisher        String
+  date             DateTime @db.Date
+  url              String
+  description      String?
+  Student          Student? @relation(fields: [studentId], references: [id])
+  studentId        String?
+}
+
+model studentPatents {
+  id            String   @id @default(uuid())
+  patentTitle   String
+  applicationNo String
+  date          DateTime @db.Date
+  url           String
+  description   String
+  studentId     String
+  Student       Student  @relation(fields: [studentId], references: [id])
+}
+
+model participationExams {
+  id            String   @id @default(uuid())
+  examName      String
+  rank          String
+  date          DateTime @db.Date
+  description   String?
+  hallTicketUrl String?
+  resultUrl     String?
+  studentId     String
+  Student       Student  @relation(fields: [studentId], references: [id])
+}
+
+model Achievements {
+  id               String          @id @default(uuid())
+  achievementType  achievementType
+  achievementTitle String
+  issuer           String
+  date             DateTime        @db.Date
+  description      String
+  studentId        String
+  Student          Student         @relation(fields: [studentId], references: [id])
+}
+
+enum achievementType {
+  HONOR
+  AWARD
+}
+
+model coCurricular {
+  id             String   @id @default(uuid())
+  name           String
+  description    String
+  date           DateTime @db.Date
+  certificateUrl String
+  Student        Student? @relation(fields: [studentId], references: [id])
+  studentId      String?
+}
+
+model extraCurricular {
+  id             String   @id @default(uuid())
+  name           String
+  description    String
+  date           DateTime @db.Date
+  certificateUrl String
+  Student        Student? @relation(fields: [studentId], references: [id])
+  studentId      String?
+}
+
+enum Role {
+  STUDENT
+  FACULTY
+  BRANCH_ADMIN
+  EXAM_ADMIN
+  ADMINISTRATION_ADMIN
+  REGISTRAR
+  PRINCIPAL
+  VICE_CHANCELLOR
+  ALUMNI_ADMIN
+  CERTIFICATE_ADMIN
+  SUPERADMIN
+  STAFF
+}
+
+// model Faculty {
+//   id            String      @id @default(uuid())
+//   facultyEmail  String      @unique
+//   facultyPhone  String      @unique
+//   firstName     String?
+//   lastName      String?
+//   bloodGroup    bloodGroup?
+//   gender        Gender?
+//   dob           DateTime?   @db.Date
+//   address       String?
+//   religion      Religion?
+//   nationalityId String?
+//   role          Role        @default(FACULTY)
+//   password      String
+//   about         String?
+//   createdOn     DateTime    @default(now())
+//   updatedOn     DateTime    @updatedAt
+// }

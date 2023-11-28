@@ -26,13 +26,9 @@ app.use(express.urlencoded({ extended: false }));
 
 
 // Routes
-app.use(userrouter);
+app.use("/api",userrouter);
 app.get("/", async (req: Request, res: Response, next: NextFunction) => {
-        // next(createHttpError(404,"Not found",{expose:false}))
-        // next(errors.BAD_REQUEST("Its a bad request"))
-    next(createHttpError[400])
-    // createHttpError[400]
-    // res.json({message:"Home"})
+    res.json({message:"Hello World"})
 });
 
 // Error handling

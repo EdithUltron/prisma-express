@@ -1,8 +1,5 @@
 import express from "express";
-
-// import {
-//     create, get, list, update, deleteData
-// } from '../../controllers/user';
+import studentFunctions from "../../controllers/user/index.js";
 
 async function demo(req,res,next) {
     res.send("User Route: "+(req?.params?.id));
@@ -11,10 +8,13 @@ async function demo(req,res,next) {
 const router = express.Router();
 
 router.get('/', demo);
-router.post('/create', demo);
-router.post('/list', demo);
-router.get('/:id',demo);
-router.put('/update/:id', demo);
-router.delete('/delete/:id', demo);
+router.post('/login', demo);
+router.post('/register', demo); // first register
+router.post('/create', studentFunctions.create); // create with register (send register id)
+router.post('/createar', demo); // create after register
+router.post('/list', demo); // list all students
+router.get('/:id',demo); // get by id
+router.put('/update/:id', demo); // update by id
+router.delete('/delete/:id', demo); // delete by id
 
 export default router;
