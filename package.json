@@ -10,8 +10,9 @@
     "build": "tsc --build",
     "start": "node ./dist/server.js",
     "start:prod": "node ./dist/server.js",
-    "vercel-build": "npm install && npx prisma migrate deploy && npx prisma generate && npx prisma db seed && tsc --build",
+    "vercel-build": "npm install && npx prisma migrate deploy && npx prisma generate && tsc --build",
     "seed": "ts-node prisma/seed.ts",
+    "prebuild": "mv package.json ./dist",
     "postbuild": "mv node_modules ./dist"
   },
   "prisma": {
