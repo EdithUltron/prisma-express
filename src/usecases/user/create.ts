@@ -1,5 +1,6 @@
 import { prisma } from "../../database/postgres/prisma-client.js";
 import { Prisma } from "@prisma/client";
+import bcrypt from 'bcrypt'
 
 // send studentRegisterId
 const createarStudent = async (data: Prisma.StudentUncheckedCreateInput) => {
@@ -9,6 +10,7 @@ const createarStudent = async (data: Prisma.StudentUncheckedCreateInput) => {
             id: studentRegisterId
         }
     });
+    const pHash = bcrypt.hashSync((lastName+"@"+studentPhone.slice(0,5)), 9);
     const student = await prisma.student.create({
         data: {
             sid: {
@@ -16,7 +18,7 @@ const createarStudent = async (data: Prisma.StudentUncheckedCreateInput) => {
                    id:studentRegisterId
                }
             },
-            password:lastName+"@"+studentPhone.slice(0,5)
+            password:pHash
         },
     });
     return student;
@@ -41,7 +43,7 @@ const createStudent = async (data: createStudentInterface) => {
 
     const student = prisma.student.create({
         data: {
-            password: studentRoll + "_" + branch,
+            password: bcrypt.hashSync((studentRoll + "_" + branch), 9),
             rollNumber: studentRoll,
             sid: {
                 create: {
@@ -60,6 +62,8 @@ const createStudent = async (data: createStudentInterface) => {
 
     return student;
 }
+
+
 
 
 export { createarStudent,registerStudent,createStudent };

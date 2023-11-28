@@ -1,14 +1,12 @@
 import { prisma } from "../../database/postgres/prisma-client.js";
-
+import { Prisma } from "@prisma/client";
 
 const pendinglist =async () => {
-    console.log("pendinglist")
     const pl = await prisma.studentRegister.findMany({
         where: {
             isRegistered: false
         }
     });
-    console.log(pl)
 
     return pl;
 }

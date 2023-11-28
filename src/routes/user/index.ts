@@ -7,13 +7,12 @@ async function demo(req,res,next) {
 
 const router = express.Router();
 
-router.get('/', demo);
-router.post('/login', demo);
+router.get('/pendinglist', studentFunctions.pendinglist); // list all registered students but not accepted
 router.post('/register', studentFunctions.registerStudent); // first register
-router.post('/create', studentFunctions.create); // create with register (send register id)
-router.post('/createar', demo); // create after register
-router.post('/list', demo); // list all students
-router.get('/:id',demo); // get by id
+router.post('/createar', studentFunctions.createarStudent); // create after register
+router.post('/create', studentFunctions.createFullStudent); // create with register (send register id)
+router.get('/:id',studentFunctions.getStudent); // get by id
+router.get('/list', studentFunctions.list); // list all students
 router.put('/update/:id', demo); // update by id
 router.delete('/delete/:id', demo); // delete by id
 

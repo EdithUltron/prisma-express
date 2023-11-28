@@ -5,6 +5,8 @@ type customdata = string | JwtPayload;
 
 interface CustomRequest extends Request {
  userid: customdata;
+ userrole: customdata;
+ userbranch: customdata;
 }
 
 const auth = (req: Request, res: Response, next: NextFunction) => {
@@ -14,7 +16,10 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
         if (token) {
             token = token.split(" ")[1];
             let userdata= jwt.verify(token, process.env.JWT_SECRET);
-            (req as CustomRequest).userid = (userdata as JwtPayload).userid;
+            (req as CustomRequest).userid = (userdata as JwtPayload).id;
+            (req as CustomRequest).userrole = (userdata as JwtPayload).role;
+            (req as CustomRequest).userbranch = (userdata as JwtPayload).branch;
+            console.log(userdata)
             next()
         }
         else {
