@@ -3,8 +3,8 @@ import user from './user.js';
 
 const studentFunctions = {
 
+  registerStudent:user.register(registerStudent),
   createarStudent:user.createar(createarStudent),
-  registerStudent:user.create(registerStudent),
   create: user.create(createStudent),
   get: user.get(createarStudent),
   list: user.list(createarStudent),

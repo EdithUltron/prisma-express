@@ -16,14 +16,6 @@ const register = (registerUseCase) => async (req, res) => {
   }
 };
 
-const createar = (createarUseCase) => async (req, res) => {
-  try {
-    const response = await createarUseCase(req.body);
-    return res.json(response);
-  } catch (err) {
-    return res.status(500).json({ error: 'User not created' });
-  }
-};
 
 const get = (getUseCase) => async (req, res) => {
   try {
@@ -61,14 +53,13 @@ const deleteData = (deleteUseCase) => async (req, res) => {
   }
 };
 
-const user = {
+const college = {
   create,
   register,
-  createar,
   get,
   list,
   update,
   deleteData,
 };
 
-export default user;
+export default college;

@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.get('/', demo);
 router.post('/login', demo);
-router.post('/register', demo); // first register
+router.post('/register', studentFunctions.registerStudent); // first register
 router.post('/create', studentFunctions.create); // create with register (send register id)
 router.post('/createar', demo); // create after register
 router.post('/list', demo); // list all students
