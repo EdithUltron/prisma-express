@@ -1,6 +1,6 @@
 // Global dependencies
 import express, { Request, Response, NextFunction, Application } from "express";
-import createHttpError from "http-errors";
+// import createHttpError from "http-errors";
 import { config } from "dotenv";
 
 // Project dependencies
