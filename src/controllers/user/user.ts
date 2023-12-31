@@ -1,54 +1,62 @@
 import { NextFunction } from 'express';
 import { Request, Response } from 'express';
+import { checkEmail } from '../../utils/checkEmail.js';
+import jwt, { JwtPayload } from "jsonwebtoken";
 
-const create = (createUseCase) => async (req:Request, res:Response) => {
+interface CustomRequest extends Request {
+  user:  {role:string}
+}
+const create = (createUseCase) => async (req:Request, res:Response,next:NextFunction) => {
   try {
-    const response = await createUseCase(req.body);
+    const response = await createUseCase(req,next);
     return res.json(response);
   } catch (err) {
-    return res.status(500).json({ error: 'student already exists' });
+    return res.status(500).json({status:"fail", error: 'Cannot Create' });
   }
 };
 
-const register = (registerUseCase) => async (req:Request, res:Response) => {
+const register = (registerUseCase) => async (req:Request, res:Response,next:NextFunction) => {
   try {
-    const response = await registerUseCase(req.body);
+    const response = await registerUseCase(req.body,next);
     return res.json(response);
   } catch (err) {
-    return res.status(500).json({ error: 'phone or email already exists' });
+    console.log(err);
+    return res.status(500).json({ error: 'Cannot Register - Check Aadhaar/Phone/Email' });
   }
 };
 
-const createar = (createarUseCase) => async (req:Request, res:Response) => {
+export const updateDetails = (UpdateUseCase) => async (req:Request, res:Response,next:NextFunction) => {
   try {
-    const response = await createarUseCase(req.body);
+    const response = await UpdateUseCase(req,next);
     return res.json(response);
   } catch (err) {
-    return res.status(500).json({ error: 'student cannot be created' });
+    console.log(err);
+    return res.status(500).json({ error: 'Cannot Update' });
   }
 };
 
-const get = (getUseCase) => async (req:Request, res:Response) => {
+
+
+const get = (getUseCase) => async (req, res:Response,next:NextFunction) => {
   try {
-    const response = await getUseCase(req.params.id);
+    const response = await getUseCase(req.user.id,next);
     return res.json(response);
   } catch (err) {
     return res.status(500).json({ error: 'data not found.' });
   }
 };
 
-const list = (listUseCase) => async (req:Request, res:Response) => {
+const list = (listUseCase) => async (req:Request, res:Response,next:NextFunction) => {
   try {
-    const response = await listUseCase(req.body);
+    const response = await listUseCase(req.body,next);
     return res.json(response);
   } catch (err) {
     return res.status(500).json({ error: 'data not found.' });
   }
 };
 
-const listAll = (listUseCase) => async (req:Request, res:Response) => {
+const listAll = (listUseCase) => async (req:Request, res:Response,next:NextFunction) => {
   try {
-    console.log("In listAll")
     const response = await listUseCase();
     return res.json(response);
   } catch (err) {
@@ -56,41 +64,49 @@ const listAll = (listUseCase) => async (req:Request, res:Response) => {
   }
 };
 
-const login = (loginUseCase) => async (req:Request, res:Response,next:NextFunction) => {
-  try {
-    const response = await loginUseCase(req.body);
-    if (response.status == "fail") {
-      return res.status(500).json("incorrect password");
+const login = (loginUseCase) => async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const response = await loginUseCase(req.body, next);
+      return res.json(response);
+    } catch (err) {
+      return res.status(500).json(err.message);
     }
-    return res.json(response);
-  } catch (err) {
-    return res.status(500).json(err.message);
-  }
-};
+  };
 
-const update = (updateUseCase) => async (req:Request, res:Response) => {
+const update = (updateUseCase) => async (req:Request, res:Response,next:NextFunction) => {
   try {
     const response = await updateUseCase(req.params.id,req.body);
     return res.json(response);
   } catch (err) {
-    return res.status(500).json({ error: 'data not found.' });
+    return res.status(500).json({ error: 'Cannot Update' });
   }
 };
 
-const deleteData = (deleteUseCase) => async (req:Request, res:Response) => {
+const deleteData = (deleteUseCase) => async (req:Request, res:Response,next:NextFunction) => {
   try {
     const response = await deleteUseCase(req.params.id);
     return res.json(response);
   } catch (err) {
-    return res.status(500).json({ error: 'data not found.' });
+    return res.status(500).json({ error: 'Cannot Delete' });
   }
 };
 
+export const checkemail =  () =>
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { email } = req.body;
+    try {
+      const response = await checkEmail(email);
+      return res.json(response);
+    } catch (err) {
+      return res.status(500).json({ error: "error checking mail" });
+    }
+    };
+  
+    
 const user = {
   create,
   login,
   register,
-  createar,
   get,
   list,
   listAll,

@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x", "linux-arm64-openssl-1.1.x", "rhel-openssl-1.0.x"]
   // binaryTargets = ["native"]
 }
@@ -7,6 +7,25 @@ generator client {
 datasource db {
   provider = "postgres"
   url      = env("DATABASE_URL")
+}
+
+model admin {
+  id         String   @id @default(uuid())
+  adminEmail String   @unique
+  adminPhone String   @unique
+  password   String
+  firstName  String?
+  lastName   String?
+  role       Role     @default(HOD)
+  branchId   String?
+  branch     Branch?  @relation(fields: [branchId], references: [id])
+  about      String?
+  createdOn  DateTime @default(now())
+  updatedOn  DateTime @updatedAt
+
+  @@unique([adminEmail, adminPhone])
+  @@index([adminEmail])
+  @@index([adminPhone])
 }
 
 model studentRegister {
@@ -25,15 +44,20 @@ model studentRegister {
   annualIncome          String?
   address               String?
   religion              Religion?
-  nationalityId         String?
+  nationality           String?
   fatherName            String?
   fatherOccupation      String?
   fatherPhone           String?
   isRegistered          Boolean?    @default(false)
 
+  state    String?
+  district String?
+  mandal   String?
+  city     String?
+
   admissionExamsId String?
   rank             String?
-  programId        String?
+  program          String?
   permanentAddress String?
   studentAadhaar   String? @unique
   yearOfAdmission  String?
@@ -46,9 +70,7 @@ model studentRegister {
   branch        Branch?         @relation(fields: [branchId], references: [id])
   Category      Category?       @relation(fields: [reservationCategoryId], references: [id])
   community     Community?      @relation(fields: [communityId], references: [id])
-  nationality   Nationality?    @relation(fields: [nationalityId], references: [id])
   admittedUnder admissionExams? @relation(fields: [admissionExamsId], references: [id])
-  joinedProgram Program?        @relation(fields: [programId], references: [id])
   Student       Student?
 
   @@unique([studentEmail, studentPhone])
@@ -56,12 +78,15 @@ model studentRegister {
   @@index([studentPhone])
 }
 
+// joinedProgram Program?        @relation(fields: [programId], references: [id])
+
 model Student {
   id                  String                @id @default(uuid())
   studentRegisterId   String                @unique
   password            String
   rollNumber          String?               @default("not-assigned")
   about               String?
+  college             String?
   role                Role                  @default(STUDENT)
   pid                 Projects[]
   education           Education[]
@@ -103,6 +128,18 @@ enum Gender {
   OTHER
 }
 
+enum Program {
+  BTECH
+  MTECH
+  MCA
+  MBA
+  BPHARM
+  MPHARM
+  MS
+  BSC
+  OTHER
+}
+
 enum Religion {
   HINDUISM
   ISLAM
@@ -119,6 +156,9 @@ model Branch {
   imageUrl         String?
   slugLine         String?
   Student_Register studentRegister[]
+  admin            admin[]
+
+  @@index([name])
 }
 
 model Category {
@@ -133,12 +173,6 @@ model Community {
   studentRegister studentRegister[]
 }
 
-model Nationality {
-  id              String            @id @default(uuid())
-  nationality     String            @unique
-  studentRegister studentRegister[]
-}
-
 model admissionExams {
   id              String            @id @default(uuid())
   examName        String            @unique
@@ -146,11 +180,11 @@ model admissionExams {
 }
 
 // btech,mtech...
-model Program {
-  id              String            @id @default(uuid())
-  programName     String            @unique
-  studentRegister studentRegister[]
-}
+// model Program {
+//   id              String            @id @default(uuid())
+//   programName     String            @unique
+//   studentRegister studentRegister[]
+// }
 
 model Projects {
   id          String   @id @default(uuid())
@@ -160,7 +194,7 @@ model Projects {
   url         String?
   studentId   String
   skills      Skills[]
-  sid         Student  @relation(fields: [studentId], references: [id])
+  sid         Student  @relation(fields: [studentId], references: [id],onDelete: Cascade)
 }
 
 model Experience {
@@ -173,7 +207,7 @@ model Experience {
   startDate   DateTime       @db.Date
   endDate     DateTime?      @db.Date
   studentId   String
-  sid         Student        @relation(fields: [studentId], references: [id])
+  sid         Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
 
 enum experienceType {
@@ -204,7 +238,7 @@ model Volunteering {
   role             String
   startDate        DateTime  @db.Date
   endDate          DateTime? @db.Date
-  Student          Student?  @relation(fields: [studentId], references: [id])
+  Student          Student?  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   studentId        String?
 }
 
@@ -213,7 +247,7 @@ model socialIdentifiers {
   name      Socials
   url       String
   studentId String
-  Student   Student @relation(fields: [studentId], references: [id])
+  Student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
 
 enum Socials {
@@ -235,22 +269,33 @@ model studentCertificates {
   validDate          DateTime? @db.Date
   certificateUrl     String
   studentId          String?
-  Student            Student?  @relation(fields: [studentId], references: [id])
+  Student            Student?  @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
 
 model Education {
-  id            String    @id @default(uuid())
+  id            String         @id @default(uuid())
   instituteName String
   place         String?
-  startDate     DateTime  @db.Date
-  endDate       DateTime? @db.Date
+  startDate     DateTime       @db.Date
+  endDate       DateTime?      @db.Date
   grades        String
   description   String?
-  program       String
+  program       EducationType?
   board         String? // for 10th
   fieldOfStudy  String // branch, mpc, 10th - state
   studentId     String?
-  Student       Student?  @relation(fields: [studentId], references: [id])
+  Student       Student?       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+enum EducationType {
+  PRIMARY
+  SECONDARY
+  INTERMEDIATE
+  UNDERGRADUATE
+  POSTGRADUATE
+  PHD
+  VOCATIONAL
+  PROFESSIONAL
 }
 
 model studentPublications {
@@ -260,7 +305,7 @@ model studentPublications {
   date             DateTime @db.Date
   url              String
   description      String?
-  Student          Student? @relation(fields: [studentId], references: [id])
+  Student          Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
   studentId        String?
 }
 
@@ -272,7 +317,7 @@ model studentPatents {
   url           String
   description   String
   studentId     String
-  Student       Student  @relation(fields: [studentId], references: [id])
+  Student       Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
 
 model participationExams {
@@ -284,7 +329,7 @@ model participationExams {
   hallTicketUrl String?
   resultUrl     String?
   studentId     String
-  Student       Student  @relation(fields: [studentId], references: [id])
+  Student       Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
 
 model Achievements {
@@ -295,7 +340,7 @@ model Achievements {
   date             DateTime        @db.Date
   description      String
   studentId        String
-  Student          Student         @relation(fields: [studentId], references: [id])
+  Student          Student         @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
 
 enum achievementType {
@@ -309,7 +354,7 @@ model coCurricular {
   description    String
   date           DateTime @db.Date
   certificateUrl String
-  Student        Student? @relation(fields: [studentId], references: [id])
+  Student        Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
   studentId      String?
 }
 
@@ -319,14 +364,14 @@ model extraCurricular {
   description    String
   date           DateTime @db.Date
   certificateUrl String
-  Student        Student? @relation(fields: [studentId], references: [id])
+  Student        Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
   studentId      String?
 }
 
 enum Role {
   STUDENT
   FACULTY
-  BRANCH_ADMIN
+  HOD
   EXAM_ADMIN
   ADMINISTRATION_ADMIN
   REGISTRAR

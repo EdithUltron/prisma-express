@@ -4,8 +4,7 @@ import express, { Request, Response, NextFunction, Application } from "express";
 import { config } from "dotenv";
 
 // Project dependencies
-import userrouter from "./routes/index.js";
-import Auth from "./middleware/auth.js"
+import apirouter from "./routes/index.js";
 import { errorHandler } from "./middleware/errors.js";
 import helmet from "helmet";
 import loginrouter from "./routes/login.js"
@@ -22,13 +21,9 @@ app.use(helmet())
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use("/auth",loginrouter);
-// app.use(Auth)
-
-// import errors from "./utils/error-handler.js"
-
 
 // Routes
-app.use("/api",userrouter);
+app.use("/api",apirouter);
 app.get("/", async (req: Request, res: Response, next: NextFunction) => {
     res.json({message:"Hello World"})
 });

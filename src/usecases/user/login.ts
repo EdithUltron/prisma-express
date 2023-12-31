@@ -1,6 +1,8 @@
 import { prisma } from "../../database/postgres/prisma-client.js";
-import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
+import { sendToken } from "../../utils/auth.js";
+import { NextFunction } from "express";
+import errors from "../../utils/error-handler.js";
 
 
 interface studentLoginInterface{
@@ -8,7 +10,7 @@ interface studentLoginInterface{
     password:string
 }
 
-const studentLogin =async (data:studentLoginInterface) => {
+const studentLogin = async (data:studentLoginInterface,next:NextFunction) => {
     // console.log(data)
     const { studentEmail, password } = data;
     try {
@@ -42,9 +44,8 @@ const studentLogin =async (data:studentLoginInterface) => {
                 }
             });
             if (bcrypt.compareSync(password, passd.password)) {
-                const token = jwt.sign({ id: passd.id, role: passd.role,branch:passd.sid.branch }, process.env.JWT_SECRET, {
-                    expiresIn: '6 hours',
-                });
+                
+                const token = await sendToken({ id: passd.id, role: passd.role, dataId:id,email:studentEmail })
 
                 return {
                     status : "success",
@@ -55,17 +56,15 @@ const studentLogin =async (data:studentLoginInterface) => {
                     }
                 }
             }
-            else {
-                return {
-                    status : "fail",
-                }
-            }
-        } catch (error) {
-            throw new Error("incorrect credentails")
-        }
+             else {
+             return next(errors["UNAUTHORIZED_REQUEST"]("Incorrect Credentials"));
+    }
+  } catch (error) {
+        return next(errors["UNAUTHORIZED_REQUEST"]("Email Not Found"));
+  }
 
     } catch (error) {
-        throw new Error("email not found")
+        return next(errors["UNAUTHORIZED_REQUEST"]("Email Not Found"));
     }
 }
 

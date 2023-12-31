@@ -6,5 +6,20 @@ const getBranches =async () => {
     return branches
 }
 
+export const getCommunity =async () => {
+    const community = await prisma.community.findMany();
+    return community
+}
+
+export const getCategory =async () => {
+    const category = await prisma.category.findMany();
+    return category
+}
+
+export const getAdmissionExams =async () => {
+    const admissionExams = await prisma.admissionExams.findMany();
+    return admissionExams
+}
+
 
 export {getBranches}

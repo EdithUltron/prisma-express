@@ -4,6 +4,7 @@ import httpErrors,{HttpError} from "http-errors";
 export const errorHandler:ErrorRequestHandler = async (err: HttpError, req: Request, res: Response, next: NextFunction) => {
  
   console.log(`${err.name} : ${err.message} - ${err.statusCode} : HTTPMethod: ${req.method} Url: ${req.url}`)
+  // console.log(err)
   if (err instanceof httpErrors.HttpError) {
     res.status(err.status).json({
       status:err.status,
@@ -11,11 +12,11 @@ export const errorHandler:ErrorRequestHandler = async (err: HttpError, req: Requ
       message: err.message
     });
   } else {
-    res.status(500).json({
-      status:500,
-      name: "Internal Server Error",
-      message: "Its Not Your Problem, Its Ours"
-    });
+  res.status(err.statusCode || 401).json({
+    status: err.statusCode || 401,
+    name: err.name,
+    message: err.message,
+  });
   }
   
 };

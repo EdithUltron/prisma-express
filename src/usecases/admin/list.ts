@@ -1,5 +1,4 @@
 import { prisma } from "../../database/postgres/prisma-client.js";
-import { Prisma } from "@prisma/client";
 
 const pendinglist =async () => {
     const pl = await prisma.studentRegister.findMany({
@@ -15,7 +14,6 @@ const listAll = async () => {
     const pl = await prisma.student.findMany();
     return pl;
 }
-
 
 
 

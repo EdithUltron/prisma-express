@@ -5,6 +5,9 @@ CREATE TYPE "bloodGroup" AS ENUM ('O_POS', 'O_NEG', 'A_POS', 'A_NEG', 'B_POS', '
 CREATE TYPE "Gender" AS ENUM ('MALE', 'FEMALE', 'OTHER');
 
 -- CreateEnum
+CREATE TYPE "Program" AS ENUM ('BTECH', 'MTECH', 'MCA', 'MBA', 'BPHARM', 'MPHARM', 'MS', 'BSC', 'OTHER');
+
+-- CreateEnum
 CREATE TYPE "Religion" AS ENUM ('HINDUISM', 'ISLAM', 'CRISTIANITY', 'SIKHISM', 'BUDDHISM', 'JAINISM', 'OTHER');
 
 -- CreateEnum
@@ -17,10 +20,30 @@ CREATE TYPE "experienceMode" AS ENUM ('ONSITE', 'REMOTE', 'HYBRID');
 CREATE TYPE "Socials" AS ENUM ('PERSONAL_WEBSITE', 'LINKEDIN', 'YOUTUBE', 'TWITTER', 'DISCORD', 'FACEBOOK', 'INSTAGRAM', 'BLOG');
 
 -- CreateEnum
+CREATE TYPE "EducationType" AS ENUM ('PRIMARY', 'SECONDARY', 'INTERMEDIATE', 'UNDERGRADUATE', 'POSTGRADUATE', 'PHD', 'VOCATIONAL', 'PROFESSIONAL');
+
+-- CreateEnum
 CREATE TYPE "achievementType" AS ENUM ('HONOR', 'AWARD');
 
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('STUDENT', 'FACULTY', 'BRANCH_ADMIN', 'EXAM_ADMIN', 'ADMINISTRATION_ADMIN', 'REGISTRAR', 'PRINCIPAL', 'VICE_CHANCELLOR', 'ALUMNI_ADMIN', 'CERTIFICATE_ADMIN', 'SUPERADMIN', 'STAFF');
+CREATE TYPE "Role" AS ENUM ('STUDENT', 'FACULTY', 'HOD', 'EXAM_ADMIN', 'ADMINISTRATION_ADMIN', 'REGISTRAR', 'PRINCIPAL', 'VICE_CHANCELLOR', 'ALUMNI_ADMIN', 'CERTIFICATE_ADMIN', 'SUPERADMIN', 'STAFF');
+
+-- CreateTable
+CREATE TABLE "admin" (
+    "id" TEXT NOT NULL,
+    "adminEmail" TEXT NOT NULL,
+    "adminPhone" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "firstName" TEXT,
+    "lastName" TEXT,
+    "role" "Role" NOT NULL DEFAULT 'HOD',
+    "branchId" TEXT,
+    "about" TEXT,
+    "createdOn" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedOn" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "admin_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "studentRegister" (
@@ -38,14 +61,18 @@ CREATE TABLE "studentRegister" (
     "annualIncome" TEXT,
     "address" TEXT,
     "religion" "Religion",
-    "nationalityId" TEXT,
+    "nationality" TEXT,
     "fatherName" TEXT,
     "fatherOccupation" TEXT,
     "fatherPhone" TEXT,
     "isRegistered" BOOLEAN DEFAULT false,
+    "state" TEXT,
+    "district" TEXT,
+    "mandal" TEXT,
+    "city" TEXT,
     "admissionExamsId" TEXT,
     "rank" TEXT,
-    "programId" TEXT,
+    "program" TEXT,
     "permanentAddress" TEXT,
     "studentAadhaar" TEXT,
     "yearOfAdmission" TEXT,
@@ -64,6 +91,7 @@ CREATE TABLE "Student" (
     "password" TEXT NOT NULL,
     "rollNumber" TEXT DEFAULT 'not-assigned',
     "about" TEXT,
+    "college" TEXT,
     "role" "Role" NOT NULL DEFAULT 'STUDENT',
     "createdOn" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedOn" TIMESTAMP(3) NOT NULL,
@@ -98,27 +126,11 @@ CREATE TABLE "Community" (
 );
 
 -- CreateTable
-CREATE TABLE "Nationality" (
-    "id" TEXT NOT NULL,
-    "nationality" TEXT NOT NULL,
-
-    CONSTRAINT "Nationality_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "admissionExams" (
     "id" TEXT NOT NULL,
     "examName" TEXT NOT NULL,
 
     CONSTRAINT "admissionExams_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Program" (
-    "id" TEXT NOT NULL,
-    "programName" TEXT NOT NULL,
-
-    CONSTRAINT "Program_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -202,7 +214,7 @@ CREATE TABLE "Education" (
     "endDate" DATE,
     "grades" TEXT NOT NULL,
     "description" TEXT,
-    "program" TEXT NOT NULL,
+    "program" "EducationType",
     "board" TEXT,
     "fieldOfStudy" TEXT NOT NULL,
     "studentId" TEXT,
@@ -300,6 +312,21 @@ CREATE TABLE "_SkillsToStudent" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "admin_adminEmail_key" ON "admin"("adminEmail");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "admin_adminPhone_key" ON "admin"("adminPhone");
+
+-- CreateIndex
+CREATE INDEX "admin_adminEmail_idx" ON "admin"("adminEmail");
+
+-- CreateIndex
+CREATE INDEX "admin_adminPhone_idx" ON "admin"("adminPhone");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "admin_adminEmail_adminPhone_key" ON "admin"("adminEmail", "adminPhone");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "studentRegister_studentEmail_key" ON "studentRegister"("studentEmail");
 
 -- CreateIndex
@@ -330,19 +357,16 @@ CREATE UNIQUE INDEX "Student_rollNumber_studentRegisterId_key" ON "Student"("rol
 CREATE UNIQUE INDEX "Branch_name_key" ON "Branch"("name");
 
 -- CreateIndex
+CREATE INDEX "Branch_name_idx" ON "Branch"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Category_category_name_key" ON "Category"("category_name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Community_communityName_key" ON "Community"("communityName");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Nationality_nationality_key" ON "Nationality"("nationality");
-
--- CreateIndex
 CREATE UNIQUE INDEX "admissionExams_examName_key" ON "admissionExams"("examName");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Program_programName_key" ON "Program"("programName");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Skills_skillName_key" ON "Skills"("skillName");
@@ -360,6 +384,9 @@ CREATE UNIQUE INDEX "_SkillsToStudent_AB_unique" ON "_SkillsToStudent"("A", "B")
 CREATE INDEX "_SkillsToStudent_B_index" ON "_SkillsToStudent"("B");
 
 -- AddForeignKey
+ALTER TABLE "admin" ADD CONSTRAINT "admin_branchId_fkey" FOREIGN KEY ("branchId") REFERENCES "Branch"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "studentRegister" ADD CONSTRAINT "studentRegister_branchId_fkey" FOREIGN KEY ("branchId") REFERENCES "Branch"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -369,13 +396,7 @@ ALTER TABLE "studentRegister" ADD CONSTRAINT "studentRegister_reservationCategor
 ALTER TABLE "studentRegister" ADD CONSTRAINT "studentRegister_communityId_fkey" FOREIGN KEY ("communityId") REFERENCES "Community"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "studentRegister" ADD CONSTRAINT "studentRegister_nationalityId_fkey" FOREIGN KEY ("nationalityId") REFERENCES "Nationality"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "studentRegister" ADD CONSTRAINT "studentRegister_admissionExamsId_fkey" FOREIGN KEY ("admissionExamsId") REFERENCES "admissionExams"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "studentRegister" ADD CONSTRAINT "studentRegister_programId_fkey" FOREIGN KEY ("programId") REFERENCES "Program"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Student" ADD CONSTRAINT "Student_studentRegisterId_fkey" FOREIGN KEY ("studentRegisterId") REFERENCES "studentRegister"("id") ON DELETE CASCADE ON UPDATE CASCADE;
