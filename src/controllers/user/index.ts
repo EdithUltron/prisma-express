@@ -2,7 +2,7 @@ import {createAchievements, createCertificates, createCocurricular, createEducat
 import { deleteAchievements, deleteCertificates, deleteCocurricular, deleteEducation, deleteExams, deleteExperience, deleteExtracurricular, deletePatents, deleteProjects, deletePublications, deleteSkills, deleteSocials, deleteVolunteering } from "../../usecases/user/delete.js";
 import { getAchievements, getCertificates, getCocurricular, getEducation, getExams, getExperience, getExtracurricular, getHomePageDetails, getPatents, getProjects, getPublications, getSkills, getSocials, getVolunteering } from "../../usecases/user/get.js";
 import { studentLogin } from "../../usecases/user/login.js";
-import { updateAchievements, updateCertificates, updateCocurricular, updateEducation, updateExams, updateExperience, updateExtracurricular, updateHomePageDetails, updatePatents, updateProjects, updatePublications, updateSkills, updateSocials, updateVolunteering } from "../../usecases/user/update.js";
+import { updateAchievements, updateCertificates, updateCocurricular, updateEducation, updateExams, updateExperience, updateExtracurricular, updateHomePageDetails, updatePatents, updateProfileDetails, updateProjects, updatePublications, updateSkills, updateSocials, updateVolunteering } from "../../usecases/user/update.js";
 import user, { checkemail,updateDetails } from './user.js';
 
 const studentFunctions = {
@@ -37,6 +37,7 @@ const studentFunctions = {
   createSkills: user.create(createSkills),
 
   updateHome: updateDetails(updateHomePageDetails),
+  updateProfile: updateDetails(updateProfileDetails),
   updateProjects: user.update(updateProjects),
   updateEducation: user.update(updateEducation),
   updateExperience: user.update(updateExperience),

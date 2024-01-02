@@ -2,9 +2,31 @@ import { prisma } from "../../database/postgres/prisma-client.js";
 
 const pendinglist =async () => {
     const pl = await prisma.studentRegister.findMany({
-        where: {
-            isRegistered: false
-        }
+      where: {
+        isRegistered: false,
+      },
+      include: {
+        department: {
+          select: {
+            departmentName: true,
+          },
+        },
+        category: {
+          select: {
+            categoryName: true,
+          },
+        },
+        community: {
+          select: {
+            communityName: true,
+          },
+        },
+        admittedUnder: {
+          select: {
+            examName: true,
+          },
+        },
+      },
     });
 
     return pl;

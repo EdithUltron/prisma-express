@@ -7,7 +7,11 @@ interface CustomRequest extends Request {
   user: customdata;
 }
 
-const authAdminHod = async (req: Request, res: Response, next: NextFunction) => {
+const authAdminAlumni = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   // MIDDLEWARE FOR AUTHORIZATION (MAKING SURE THEY ARE LOGGED IN)
   try {
     // check if auth header exists
@@ -16,7 +20,7 @@ const authAdminHod = async (req: Request, res: Response, next: NextFunction) => 
       const token = req.headers.authorization.split(" ")[1]; //split the header and get the token
       if (token) {
         const payload = jwt.verify(token, process.env.JWT_SECRET);
-        if (payload && (payload as JwtPayload).role == "HOD") {
+        if (payload && (payload as JwtPayload).role == "ALUMNI_ADMIN") {
           // store user data in request object
           (req as CustomRequest).user = payload;
           // console.log(payload)
@@ -36,4 +40,4 @@ const authAdminHod = async (req: Request, res: Response, next: NextFunction) => 
 };
 
 // export custom middleware
-export default authAdminHod;
+export default authAdminAlumni;

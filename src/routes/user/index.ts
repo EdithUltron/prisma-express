@@ -40,6 +40,7 @@ router.post('/createextracurricular', studentFunctions.createExtracurricular);
 router.post('/createskills', studentFunctions.createSkills);
 
 router.put('/', studentFunctions.updateHome); // get by id
+router.put('/profile', studentFunctions.updateProfile); // get by id
 router.put('/updateprojects/:id', studentFunctions.updateProjects);
 router.put('/updateeducation/:id', studentFunctions.updateEducation);
 router.put('/updateexperience/:id', studentFunctions.updateExperience);

@@ -6,34 +6,33 @@ import errors from "../../utils/error-handler.js";
 import bcrypt from "bcrypt";
 
 
-export const createAdmin = async (data: Prisma.adminUncheckedCreateInput,next:NextFunction) => {
+// export const createAdmin = async (data: Prisma.adminUncheckedCreateInput,next:NextFunction) => {
     
-    const validateEmail = await checkEmail(data.adminEmail);
+//     const validateEmail = await checkEmail(data.adminEmail);
 
-    if (!validateEmail?.status) {
-        // next(new createHttpError.Unauthorized(validateEmail?.message));
-        return next(errors["UNAUTHORIZED_REQUEST"](validateEmail?.message));
-    }
+//     if (!validateEmail?.status) {
+//         // next(new createHttpError.Unauthorized(validateEmail?.message));
+//         return next(errors["UNAUTHORIZED_REQUEST"](validateEmail?.message));
+//     }
 
-    const createAdmin = await prisma.admin.create({
-        data: {
-            ...data,
-            password: bcrypt.hashSync(data.password,9)
-        }
-    });
-    return createAdmin;
-}
+//     const createAdmin = await prisma.admin.create({
+//         data: {
+//             ...data,
+//             password: bcrypt.hashSync(data.password,9)
+//         }
+//     });
+//     return createAdmin;
+// }
 
 
 
-const createBranch =async (data:Prisma.BranchUncheckedCreateInput) => {
-    const branch = prisma.branch.create({
+export const createdepartment =async (data:Prisma.DepartmentUncheckedCreateInput) => {
+    const department = prisma.department.create({
         data,
     });
-    return branch;
+    return department;
 }
 
-export { createBranch };
 
 // send studentRegisterId
 export const createarStudent = async (
@@ -76,17 +75,28 @@ export const createarStudent = async (
 };
 
 interface createStudentInterface {
-  studentRoll: string;
-  branch: string;
-  studentEmail: string;
-  studentPhone: string;
+  studentRoll: string,
+  department: string,
+  studentEmail: string,
+  studentPhone: string,
+  year: string,
+  collegeId:string,
+  universityId:string,
 }
 
 export const createStudent = async (
   data: createStudentInterface,
   next: NextFunction
 ) => {
-  const { studentRoll, studentEmail, studentPhone, branch } = data;
+  const {
+    studentRoll,
+    studentEmail,
+    studentPhone,
+    department,
+    year,
+    collegeId,
+    universityId,
+  } = data;
 
   const validateEmail = await checkEmail(studentEmail);
 
@@ -97,16 +107,27 @@ export const createStudent = async (
 
   const student = prisma.student.create({
     data: {
-      password: bcrypt.hashSync(studentRoll + "_" + branch, 9),
+      password: bcrypt.hashSync(studentRoll, 9),
       rollNumber: studentRoll,
       sid: {
         create: {
           studentEmail: studentEmail,
           studentPhone: studentPhone,
-          isRegistered: true,
-          branch: {
+          College: {
             connect: {
-              name: branch,
+              collegeId,
+            }
+          },
+          university: {
+            connect: {
+              universityId,
+            }
+          },
+          isRegistered: true,
+          yearOfAdmission:year,
+          department: {
+            connect: {
+              id: department,
             },
           },
         },

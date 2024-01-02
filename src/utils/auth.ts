@@ -4,7 +4,10 @@ interface payload {
   id: String;
   role: String;
   dataId?: String;
-  email:String
+  email: String,
+  collegeId?: String,
+  universityId?:String,
+  departmentId?:String,
 }
 
 const sendToken = async(data:payload) => {

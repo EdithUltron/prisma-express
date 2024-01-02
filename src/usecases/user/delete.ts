@@ -113,7 +113,7 @@ export const deleteExtracurricular = async (id, next: NextFunction) => {
   return deletedData;
 };
 export const deleteSkills = async (id, next: NextFunction) => {
-    const deletedData = await prisma.skills.delete({
+    const deletedData = await prisma.skillRating.delete({
     where: {
       id,
     }

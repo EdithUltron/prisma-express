@@ -1,9 +1,15 @@
 import { prisma } from "../../database/postgres/prisma-client.js";
 // import { Prisma } from "@prisma/client";
 
-const getBranches =async () => {
-    const branches = await prisma.branch.findMany();
-    return branches
+export const getdepartments =async (id) => {
+    const departments = await prisma.department.findMany({
+        where: {
+            college: {
+                collegeId:id
+            }
+        }
+    });
+    return departments
 }
 
 export const getCommunity =async () => {
@@ -21,5 +27,18 @@ export const getAdmissionExams =async () => {
     return admissionExams
 }
 
+export const getSkills =async () => {
+    const skills = await prisma.skills.findMany();
+    return skills
+}
 
-export {getBranches}
+export const getPrograms = async (id) => {
+    const programs = await prisma.program.findMany({
+      where: {
+        college: {
+          collegeId: id,
+        },
+      },
+    });
+  return programs;
+};

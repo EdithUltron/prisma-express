@@ -1,13 +1,32 @@
 import { NextFunction } from "express";
 import { prisma } from "../../database/postgres/prisma-client.js";
+import { exclude } from "../../utils/exclude.js";
 
 export const updateHomePageDetails = async (req, next: NextFunction) => {
   const { dataId } = req.user;
-  const data = req.body;
+    const ldata = req.body;
+    
+    const data = await exclude(ldata, ["studentRegisterId"]);
     
   const updatedData = await prisma.studentRegister.update({
     where: {
       id:dataId,
+    },
+    data: {
+      ...data,
+    },
+  });
+
+  return updatedData;
+};
+
+export const updateProfileDetails = async (req, next: NextFunction) => {
+  const { id } = req.user;
+    const data = req.body;
+        
+  const updatedData = await prisma.student.update({
+    where: {
+      id:id,
     },
     data: {
       ...data,
@@ -167,14 +186,18 @@ export const updateExtracurricular = async (id, data, next: NextFunction) => {
 };
 
 export const updateSkills = async (id, data, next: NextFunction) => {
-    const updatedData = await prisma.skills.update({
+
+    const { rating } = data;
+
+    const updatedData = await prisma.skillRating.update({
         where:{
             id
         },
         data:{
-            ...data,
+            rating:parseInt(rating)
         }
     });
+
     return updatedData;
 };
 

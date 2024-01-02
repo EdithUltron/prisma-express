@@ -11,6 +11,7 @@ const create = (createUseCase) => async (req:Request, res:Response,next:NextFunc
     const response = await createUseCase(req,next);
     return res.json(response);
   } catch (err) {
+    console.log(err)
     return res.status(500).json({status:"fail", error: 'Cannot Create' });
   }
 };
@@ -42,6 +43,7 @@ const get = (getUseCase) => async (req, res:Response,next:NextFunction) => {
     const response = await getUseCase(req.user.id,next);
     return res.json(response);
   } catch (err) {
+    // console.log(err);
     return res.status(500).json({ error: 'data not found.' });
   }
 };

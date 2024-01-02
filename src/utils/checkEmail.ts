@@ -14,18 +14,18 @@ export const checkEmail = async (email: string) => {
         };
     }
 
-  const admin = await prisma.admin.findUnique({
-    where: {
-      adminEmail:email
-    },
-  });
+  // const admin = await prisma.admin.findUnique({
+  //   where: {
+  //     adminEmail:email
+  //   },
+  // });
 
-    if (admin) {
-        return {
-            status: false,
-            message:"Admin With Mail Already Exists"
-        }
-    }
+  //   if (admin) {
+  //       return {
+  //           status: false,
+  //           message:"Admin With Mail Already Exists"
+  //       }
+  //   }
 
 
     return {

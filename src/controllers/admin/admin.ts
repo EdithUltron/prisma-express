@@ -36,6 +36,7 @@ const listAll = (listUseCase) => async (req:Request, res:Response,next:NextFunct
     const response = await listUseCase();
     return res.json(response);
   } catch (err) {
+    console.log(err)
     return res.status(500).json({ error: 'data not found.' });
   }
 };
