@@ -83,7 +83,11 @@ export const getEducation = async (id: string, next: NextFunction) => {
       id,
     },
     select: {
-      education: true,
+      education: {
+        orderBy: {
+          startDate: "asc",
+        }
+      },
     },
   });
 
@@ -95,7 +99,11 @@ export const getExperience = async (id: string, next: NextFunction) => {
       id,
     },
     select: {
-      experience: true,
+      experience: {
+        orderBy: {
+          startDate: "asc",
+        },
+      },
     },
   });
 
@@ -221,6 +229,23 @@ export const getSkills = async (id: string, next: NextFunction) => {
         },
         orderBy: {
           rating:"desc"
+        }
+      }
+    },
+  });
+
+  return data;
+};
+
+export const getScholarships = async (id: string, next: NextFunction) => {
+  const data = await prisma.student.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      Scholarships: {
+        orderBy: {
+          date:"desc"
         }
       }
     },

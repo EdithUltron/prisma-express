@@ -9,13 +9,14 @@ export const registerStudent = async (
   data: Prisma.studentRegisterUncheckedCreateInput,
   next: NextFunction
 ) => {
-  const { studentEmail, collegeId, universityId } = data;
+  const { studentEmail, collegeId, universityId, departmentId } = data;
   const validateEmail = await checkEmail(studentEmail);
 
   if (!validateEmail?.status) {
     // next(new createHttpError.Unauthorized(validateEmail?.message));
     return next(errors["UNAUTHORIZED_REQUEST"](validateEmail?.message));
   }
+
 
   const college = await prisma.college.findFirst({
     where: {
@@ -205,15 +206,28 @@ export const createExtracurricular = async (req, next: NextFunction) => {
 };
 export const createSkills = async (req, next: NextFunction) => {
   const { id } = req.user;
-  const { skillId, rating } = req.body;
+  const { rating } = req.body;
 
   const project = await prisma.skillRating.create({
     data: {
       studentId: id,
-      skillId,
+      ...req.body,
       rating:parseInt(rating),
     },
   });
 
   return project;
+};
+export const createScholarships = async (req, next: NextFunction) => {
+    const { id } = req.user;
+    const data = req.body;
+
+    const project = await prisma.scholarships.create({
+      data: {
+        studentId: id,
+        ...data,
+      },
+    });
+
+    return project;
 };

@@ -24,6 +24,7 @@ router.get('/achievements', studentFunctions.getAchievements);
 router.get('/cocurricular', studentFunctions.getCocurricular);
 router.get('/extracurricular', studentFunctions.getExtracurricular);
 router.get('/skills', studentFunctions.getSkills);
+router.get('/scholarships', studentFunctions.getScholarships);
 
 router.post('/createprojects', studentFunctions.createProjects);
 router.post('/createeducation', studentFunctions.createEducation);
@@ -38,6 +39,7 @@ router.post('/createachievements', studentFunctions.createAchievements);
 router.post('/createcocurricular', studentFunctions.createCocurricular);
 router.post('/createextracurricular', studentFunctions.createExtracurricular);
 router.post('/createskills', studentFunctions.createSkills);
+router.post('/createscholarships', studentFunctions.createScholarships);
 
 router.put('/', studentFunctions.updateHome); // get by id
 router.put('/profile', studentFunctions.updateProfile); // get by id
@@ -54,6 +56,7 @@ router.put('/updateachievements/:id', studentFunctions.updateAchievements);
 router.put('/updatecocurricular/:id', studentFunctions.updateCocurricular);
 router.put('/updateextracurricular/:id', studentFunctions.updateExtracurricular);
 router.put('/updateskills/:id', studentFunctions.updateSkills);
+router.put("/updatescholarships/:id", studentFunctions.updateScholarships);
 
 router.delete('/deleteprojects/:id', studentFunctions.deleteProjects);
 router.delete('/deleteeducation/:id', studentFunctions.deleteEducation);
@@ -68,6 +71,7 @@ router.delete('/deleteachievements/:id', studentFunctions.deleteAchievements);
 router.delete('/deletecocurricular/:id', studentFunctions.deleteCocurricular);
 router.delete('/deleteextracurricular/:id', studentFunctions.deleteExtracurricular);
 router.delete('/deleteskills/:id', studentFunctions.deleteSkills);
+router.delete("/deletescholarships/:id", studentFunctions.deleteScholarships);
 
 
 router.put('/update/:id', demo); // update by id

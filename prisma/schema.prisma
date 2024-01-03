@@ -34,6 +34,46 @@ model College {
   @@index([collegeName])
 }
 
+model Semester {
+  id             String       @id @default(uuid())
+  name           String
+  semesterNumber String
+  year           String
+  credits        String
+  status         resultStatus
+  gradePoints    String
+  departmentId   String
+  studentId      String
+  department     Department   @relation(fields: [departmentId], references: [id])
+  Student        Student      @relation(fields: [studentId], references: [id])
+  Subject        Subject[]
+
+  @@unique([name, studentId, departmentId])
+}
+
+enum resultStatus {
+  PASS
+  FAIL
+  ABSENT
+}
+
+model Subject {
+  id          String       @id @default(uuid())
+  subjectCode String       @unique
+  name        String
+  status      resultStatus
+  credits     String
+  gradePoints String
+  grade       String
+  semesterId  String
+  studentId   String
+  Semester    Semester     @relation(fields: [semesterId], references: [id])
+  Student     Student      @relation(fields: [studentId], references: [id])
+
+  @@unique([studentId, semesterId])
+  @@index([subjectCode])
+}
+
 model studentRegister {
   id                    String      @id @default(uuid())
   studentEmail          String      @unique
@@ -99,7 +139,10 @@ model Student {
   slugLine            String?               @default("student")
   profilePic          String?
   resumeUrl           String?
+  year                String?               @default("1")
+  entrepreneurId      String?
   role                Role                  @default(STUDENT)
+  Entrepreneur        Entrepreneur?         @relation(fields: [entrepreneurId], references: [id])
   pid                 Projects[]
   education           Education[]
   experience          Experience[]
@@ -113,10 +156,15 @@ model Student {
   coCurricular        coCurricular[]
   extraCurricular     extraCurricular[]
 
-  createdOn   DateTime        @default(now())
-  updatedOn   DateTime        @updatedAt
-  sid         studentRegister @relation(fields: [studentRegisterId], references: [id], onDelete: Cascade)
-  SkillRating SkillRating[]
+  createdOn      DateTime         @default(now())
+  updatedOn      DateTime         @updatedAt
+  sid            studentRegister  @relation(fields: [studentRegisterId], references: [id], onDelete: Cascade)
+  SkillRating    SkillRating[]
+  Scholarships   Scholarships[]
+  Semester       Semester[]
+  Subject        Subject[]
+  Placements     Placements[]
+  honorsOrMinors honorsOrMinors[]
 
   @@unique([rollNumber, studentRegisterId])
   @@index([studentRegisterId, rollNumber])
@@ -173,6 +221,7 @@ model Department {
   college         College           @relation(fields: [collegeId], references: [id])
   university      University        @relation(fields: [universityId], references: [id])
   StudentRegister studentRegister[]
+  Semester        Semester[]
 
   @@unique([departmentId, departmentName, collegeId])
   @@index([departmentId, departmentName, collegeId])
@@ -209,6 +258,32 @@ model Program {
 
   @@unique([programName, collegeId])
   @@index([programName])
+}
+
+model honorsOrMinors {
+  id            String         @id @default(uuid())
+  name          String
+  instituteName String
+  description   String?
+  url           String?
+  type          hmType?
+  place         String?
+  startDate     DateTime       @db.Date
+  endDate       DateTime?      @db.Date
+  grades        String
+  program       EducationType?
+  board         String? // for 10th
+  fieldOfStudy  String // department, mpc, 10th - state
+  studentId     String?
+  Student       Student?       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([startDate, instituteName, studentId])
+  @@index([studentId])
+}
+
+enum hmType {
+  HONORS
+  MINORS
 }
 
 model Projects {
@@ -264,6 +339,7 @@ model SkillRating {
   skillId   String
   studentId String
   rating    Int
+  years     String?
   student   Student    @relation(fields: [studentId], references: [id])
   skill     Skills     @relation(fields: [skillId], references: [id])
   Projects  Projects[]
@@ -355,17 +431,21 @@ enum EducationType {
   PHD
   VOCATIONAL
   PROFESSIONAL
+  DIPLOMA
 }
 
 model studentPublications {
-  id               String   @id @default(uuid())
-  publicationTitle String
-  publisher        String
-  date             DateTime @db.Date
-  url              String
-  description      String?
-  Student          Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  studentId        String?
+  id                 String   @id @default(uuid())
+  publicationTitle   String
+  publisher          String
+  publicationDetails String?
+  type               String?
+  ISSN_NO            String?
+  date               DateTime @db.Date
+  url                String?
+  description        String?
+  Student            Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId          String?
 
   @@unique([publicationTitle, publisher, studentId])
   @@index([studentId])
@@ -405,8 +485,10 @@ model Achievements {
   achievementType  achievementType
   achievementTitle String
   issuer           String
+  teamOrIndiv      String?
   date             DateTime        @db.Date
   description      String
+  eventName        String?
   studentId        String
   Student          Student         @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
@@ -419,10 +501,56 @@ enum achievementType {
   AWARD
 }
 
+model Scholarships {
+  id          String   @id @default(uuid())
+  name        String
+  type        String
+  org         String
+  institution Boolean?
+  date        DateTime @db.Date
+  amount      String?
+  url         String?
+  studentId   String
+  Student     Student  @relation(fields: [studentId], references: [id])
+}
+
+model Entrepreneur {
+  id          String   @id @default(uuid())
+  companyName String
+  type        String
+  regNo       String?
+  funded      Boolean
+  org         String?
+  other       String?
+  date        DateTime @db.Date
+  description String?
+  url         String?
+
+  createdOn DateTime  @default(now())
+  updatedOn DateTime  @updatedAt
+  Student   Student[]
+}
+
+model Placements {
+  id             String   @id @default(uuid())
+  companyName    String
+  compantContact String
+  packageInLakhs String
+  internship     Boolean
+  dateOfJoin     DateTime @db.Date
+  accept         Boolean
+  Student        Student  @relation(fields: [studentId], references: [id])
+  studentId      String
+}
+
 model coCurricular {
   id             String   @id @default(uuid())
   name           String
   description    String
+  type           String?
+  level          String?
+  issuer         String?
+  eventName      String?
   date           DateTime @db.Date
   certificateUrl String
   Student        Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
@@ -436,6 +564,10 @@ model extraCurricular {
   id             String   @id @default(uuid())
   name           String
   description    String
+  type           String?
+  level          String?
+  issuer         String?
+  eventName      String?
   date           DateTime @db.Date
   certificateUrl String
   Student        Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)

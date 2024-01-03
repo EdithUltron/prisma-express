@@ -193,7 +193,8 @@ export const updateSkills = async (id, data, next: NextFunction) => {
         where:{
             id
         },
-        data:{
+        data: {
+            ...data,
             rating:parseInt(rating)
         }
     });
@@ -201,3 +202,14 @@ export const updateSkills = async (id, data, next: NextFunction) => {
     return updatedData;
 };
 
+export const updateScholarships = async (id, data, next: NextFunction) => {
+  const updatedData = await prisma.scholarships.update({
+    where: {
+      id,
+    },
+    data: {
+      ...data,
+    },
+  });
+  return updatedData;
+};

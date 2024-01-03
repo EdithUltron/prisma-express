@@ -121,3 +121,12 @@ export const deleteSkills = async (id, next: NextFunction) => {
 
   return deletedData;
 };
+export const deleteScholarships = async (id, next: NextFunction) => {
+  const deletedData = await prisma.scholarships.delete({
+    where: {
+      id,
+    },
+  });
+
+  return deletedData;
+};

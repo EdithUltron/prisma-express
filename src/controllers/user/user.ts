@@ -9,6 +9,9 @@ interface CustomRequest extends Request {
 const create = (createUseCase) => async (req:Request, res:Response,next:NextFunction) => {
   try {
     const response = await createUseCase(req,next);
+    if (!response) {
+      return next();
+    }
     return res.json(response);
   } catch (err) {
     console.log(err)
